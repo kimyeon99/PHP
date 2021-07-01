@@ -13,22 +13,32 @@
 
     <h1>게시판</h1>
     <form action="/posts/store" method = "post">
-        <div class="title">
-            <label for="title">Title</label>
-            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-          </div>
-          <div class="content">
-            <label for="content">Content</label>
-            <input type="content" class="content" id="exampleInputPassword1">
-          </div>
-          <div class="checkbox">
-            <input type="checkbox" class="checkbox" id="checkbox">
-            <label class="checkbox">Check me out</label>
-          </div>
-          <button type="submit" class="submit">Submit</button>
-    </form>
+      @csrf
+      <div class="title">
+          <label for="title">Title</label>
+          <input type="text" name="title" class="form-control" id="title" aria-describedby="emailHelp" value="{{ old('title') }}">
 
+      
+
+            @error('title')
+               <div>{{ $message }}</div>
+            @enderror
+          <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+        </div>
+        <div class="content">
+          <label for="content">Content</label>
+          <textarea type="text" name="content" class="form-control" id="content" value="{{ old('content') }}"></textarea>
+            @error('content')
+              <div>{{ $message }}</div>
+            @enderror
+          </div>
+        </div>
+        <div class="checkbox">
+          <input type="checkbox" class="checkbox" id="checkbox">
+          <label class="checkbox">Check me out</label>
+        </div>
+        <button type="submit" class="submit">Submit</button>
+  </form>
 
 
     
