@@ -8,6 +8,19 @@ use Illuminate\Support\Facades\Auth;
 
 class PostsController extends Controller
 {
+    public function __construct() // php에도 생성자가 있음!
+    {
+        $this->middleware('auth')->except(['index', 'show']);
+        // 여기있는 모든 메서드에 auto middleware 적용. except: 예외
+    }
+
+    public function show(Request $request, $id)
+    {
+        $page = $request->page;
+        $post = Post::find($id);
+        return view('posts.show', compact('post', 'page'));
+    }
+
     public function create()
     {
         // dd('OK'); //웹브라우저한테 'ok'를 주고 죽어라
@@ -46,8 +59,10 @@ class PostsController extends Controller
 
         // 결과 뷰를 저장
         return redirect('/posts/index');
+
         // get 방식의 요청 - view를 return
         // post 방식의 요청 - (대부분) redirection을 return
+        //  ㄴ view를 리턴하면 새로고침 할 때 계속 그 요청을 받음(ex: 새로고침할 때마다 글쓰기가 계속됨)
     }
 
     public function index()
@@ -56,6 +71,7 @@ class PostsController extends Controller
         // $posts = Post::latest()->get(); // 가장 최근의 글을 맨 위로.
 
         $posts = Post::latest()->Paginate(4);
+        // dd($posts);
         // 내림차순으로 한 페이지에 4개의 글을 표시
         return view('posts.index', ['posts' => $posts]);
     }
