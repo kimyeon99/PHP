@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class PostsController extends Controller
 {
@@ -37,7 +38,8 @@ class PostsController extends Controller
 
         $request->validate([
             'title' => 'required | min:3',
-            'content' => 'required'
+            'content' => 'required',
+            'imageFile' => 'image | max:2000' // 필수는 아니나 이미지 파일이어야함.
         ]); // 원하는 데이터가 아니면 페이지를 자동으로 back 시켜줌
 
         //   dd($request);
@@ -55,9 +57,37 @@ class PostsController extends Controller
         $post->user_id = Auth::user()->id;
         // 현재 로그인한 유저를 id에 저장한 것을 user_id에 저장
         // user는 models에 자동생성된 모델임
+
+
+        //File 처리
+        // 내가 원하는 파일 시스템 상의 위치에 원하는 이름으로
+        // 파일을 저장하고
+        if ($request->file('imageFile')) { // 파일이 필수가 아니라 없을 수도 있으므로 if
+            $name = $request->file('imageFile')->getClientOriginalName();
+            // $name = spaceship.jpg
+
+            $extension = $request->file('imageFile')->extension();
+            // $extension = 'jpg';
+            //  spaceship_1231fafwd.jpg
+
+
+
+
+
+            $nameWithoutExtension = Str::of($name)->basename('.' . $extension);
+            //$nameWithoutExtension = 'spaceship';
+            $fileName = $nameWithoutExtension . '_' . time() . '.' . $extension;
+            //$filename = 'spaceship'.'_'.'123453543'.'jpg';
+            $request->file('imageFile')->storeAs('public/images', $fileName); // imagefile을 image폴더안의 filename으로 저장한다.
+
+            // 그 파일 이름을 칼럼에 저장
+            $post->image = $fileName;
+
+            // 업로드 된 파일은 resources/app/images 파일에 저장된다.
+        }
+
         $post->save();
 
-        // 결과 뷰를 저장
         return redirect('/posts/index');
 
         // get 방식의 요청 - view를 return
