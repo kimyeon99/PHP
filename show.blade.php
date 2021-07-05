@@ -11,7 +11,7 @@
 
     <style>
         .btn{
-            
+
         }
     </style>
 </head>
@@ -30,8 +30,16 @@
 
           <div class="content">
             <label for="content">Content</label>
-            <textarea type="text" readonly name="content" class="form-control" id="content" value="{{ $post->content }}">{{ $post->content }}</textarea>
+            <textarea type="text" readonly name="content" class="form-control" id="content">{{ $post->content }}</textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="imageFile">Post Image</label>
+            <div class = "my-6 mx-3 w-3/12">
+                <img class = "form-control" width="20%" 
+                    src = "{{ $post->imagePath() }}"/>
             </div>
+          </div>
 
             <div class="form-group">
                 <label>등록일</label>
@@ -52,4 +60,4 @@
     </div>
 
 </body>
-</html>
+</html>                                                                                             
