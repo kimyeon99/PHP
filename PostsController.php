@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use GuzzleHttp\Psr7\UploadedFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PostsController extends Controller
@@ -63,27 +65,7 @@ class PostsController extends Controller
         // 내가 원하는 파일 시스템 상의 위치에 원하는 이름으로
         // 파일을 저장하고
         if ($request->file('imageFile')) { // 파일이 필수가 아니라 없을 수도 있으므로 if
-            $name = $request->file('imageFile')->getClientOriginalName();
-            // $name = spaceship.jpg
-
-            $extension = $request->file('imageFile')->extension();
-            // $extension = 'jpg';
-            //  spaceship_1231fafwd.jpg
-
-
-
-
-
-            $nameWithoutExtension = Str::of($name)->basename('.' . $extension);
-            //$nameWithoutExtension = 'spaceship';
-            $fileName = $nameWithoutExtension . '_' . time() . '.' . $extension;
-            //$filename = 'spaceship'.'_'.'123453543'.'jpg';
-            $request->file('imageFile')->storeAs('public/images', $fileName); // imagefile을 image폴더안의 filename으로 저장한다.
-
-            // 그 파일 이름을 칼럼에 저장
-            $post->image = $fileName;
-
-            // 업로드 된 파일은 resources/app/images 파일에 저장된다.
+            $post->image = $this->uploadPostImage($request);
         }
 
         $post->save();
@@ -95,6 +77,29 @@ class PostsController extends Controller
         //  ㄴ view를 리턴하면 새로고침 할 때 계속 그 요청을 받음(ex: 새로고침할 때마다 글쓰기가 계속됨)
     }
 
+    protected function uploadPostFile(Request $request)
+    {
+        $name = $request->file('imageFile')->getClientOriginalName();
+        // $name = spaceship.jpg
+
+        $extension = $request->file('imageFile')->extension();
+        // $extension = 'jpg';
+        //  spaceship_1231fafwd.jpg
+
+        $nameWithoutExtension = Str::of($name)->basename('.' . $extension);
+        //$nameWithoutExtension = 'spaceship';
+        $fileName = $nameWithoutExtension . '_' . time() . '.' . $extension;
+        //$filename = 'spaceship'.'_'.'123453543'.'jpg';
+        $request->file('imageFile')->storeAs('public/images', $fileName); // imagefile을 image폴더안의 filename으로 저장한다.
+
+        // 그 파일 이름을 칼럼에 저장
+        // $post->image = $fileName;
+
+        return $fileName;
+
+        // 업로드 된 파일은 resources/app/images 파일에 저장된다.
+    }
+
     public function index()
     {
         // $posts = Post::all();
@@ -104,5 +109,50 @@ class PostsController extends Controller
         // dd($posts);
         // 내림차순으로 한 페이지에 4개의 글을 표시
         return view('posts.index', ['posts' => $posts]);
+    }
+
+    public function edit(Post $post) // 수정 폼 생성
+    {
+        // $post = Post::find($id);
+        // $post - Post::where('id',$id)->('name','scpark)->first();
+        //                                                 ㄴ get();
+
+        return view('posts.edit')->with('post', $post);
+    }
+
+    public function update(Request $request, $id)
+    {
+        // validation 필요
+        // 게시글을 데이터베이스에서 수정
+        // 파일시스템에서 이미지 파일 수정
+
+        $request->validate([
+            'title' => 'required | min:3',
+            'content' => 'required',
+            'imageFile' => 'image | max:2000' // 필수는 아니나 이미지 파일이어야함.
+        ]);
+
+        $post = Post::findOrFail($id); // orFail: 괄호 안의 변수를 못 찾으면 404 에러나도록 함.
+
+        if ($request->file('imageFile')) {
+            $imagePath = 'public/images/' . $post->image; // 기존의 파일 위치
+            Storage::delete($imagePath); // 기존의 파일을 삭제
+            $post->image = $this->uploadPostFile($request); // 수정한 파일 업로드
+        }
+
+        $post->title = $request->title;
+        $post->content = $request->content;
+        $post->save();
+
+
+        return redirect()->route('posts.show', ['id' => $id]);
+    }
+
+    public function destroy($id)
+    {
+        // 게시글을 데이터베이스에서 삭제
+        // 파일 시스템에서 이미지 파일 삭제
+
+        $post = post::find($id);
     }
 }
