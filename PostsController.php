@@ -111,13 +111,12 @@ class PostsController extends Controller
         return view('posts.index', ['posts' => $posts]);
     }
 
-    public function edit(Post $post) // 수정 폼 생성
+    public function edit(Request $request, Post $post) // 수정 폼 생성
     {
         // $post = Post::find($id);
         // $post - Post::where('id',$id)->('name','scpark)->first();
         //                                                 ㄴ get();
-
-        return view('posts.edit')->with('post', $post);
+        return view('posts.edit', ['post' => $post, 'page' => $request->page]);
     }
 
     public function update(Request $request, $id)
@@ -125,6 +124,7 @@ class PostsController extends Controller
         // validation 필요
         // 게시글을 데이터베이스에서 수정
         // 파일시스템에서 이미지 파일 수정
+        $page = $request->page;
 
         $request->validate([
             'title' => 'required | min:3',
@@ -133,6 +133,16 @@ class PostsController extends Controller
         ]);
 
         $post = Post::findOrFail($id); // orFail: 괄호 안의 변수를 못 찾으면 404 에러나도록 함.
+
+        // autorization. 수정 권한이 있는지 검사
+        // 즉 로그인한 사용자와 게시글의 사용자가 같은지 검사
+        // if (auth()->user()->id != $post->user_id) {
+        //     abort(403);
+        // }
+
+        if ($request->user()->cannot('update', $post)) {
+            abort(403);
+        }
 
         if ($request->file('imageFile')) {
             $imagePath = 'public/images/' . $post->image; // 기존의 파일 위치
@@ -145,14 +155,31 @@ class PostsController extends Controller
         $post->save();
 
 
-        return redirect()->route('posts.show', ['id' => $id]);
+        return redirect()->route('posts.show', ['id' => $id, 'page' => $page]);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         // 게시글을 데이터베이스에서 삭제
         // 파일 시스템에서 이미지 파일 삭제
+        $page = $request->page;
+        $post = post::findOrFail($id);
 
-        $post = post::find($id);
+        // autorization. 수정 권한이 있는지 검사
+        // 즉 로그인한 사용자와 게시글의 사용자가 같은지 검사
+        // if (auth()->user()->id != $post->user_id) {
+        //    abort(403);}
+
+        if ($request->user()->cannot('delete', $post)) {
+            abort(403);
+        }
+
+        if ($post->image) {
+            $imagePath = 'public/images/' . $post->image; // 기존의 파일 위치
+            Storage::delete($imagePath);
+        }
+        $post->delete();
+
+        return redirect()->route('posts.index', ['id' => $id, 'page' => $page]);
     }
 }
