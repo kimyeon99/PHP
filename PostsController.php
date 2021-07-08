@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\User;
 use GuzzleHttp\Psr7\UploadedFile;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -181,5 +183,14 @@ class PostsController extends Controller
         $post->delete();
 
         return redirect()->route('posts.index', ['id' => $id, 'page' => $page]);
+    }
+
+    public function myPost()
+    {
+        // $posts = auth() -> user() -> posts() ->orderBy('title', 'asc')->
+        $posts = auth()->user()->posts()->latest()->paginate(5);
+        //$posts = User::find($id)->posts()->paginate(5);
+
+        return view('posts.myPost', ['posts' => $posts]);
     }
 }
