@@ -28,10 +28,12 @@ Route::get('/posts/create', [PostsController::class, 'create'])/* ->middleware([
 Route::post('/posts/store', [PostsController::class, 'store'])->name('posts.store');;
 Route::get('/posts/index', [PostsController::class, 'index'])->name('posts.index');
 Route::get('/posts/show/{id}', [PostsController::class, 'show'])->name('posts.show');
+Route::get('/posts/myPost', [PostsController::class, 'myPost'])->name('posts.myPost');
 
 Route::get('/posts/{post}', [PostsController::class, 'edit'])->name('posts.edit');
 Route::put('/posts/{id}', [PostsController::class, 'update'])->name('posts.update');
 Route::delete('/posts/{id}', [PostsController::class, 'destroy'])->name('posts.delete');
+
 
 // post -> 등록:post, 수정:patch || put, 제거:delete
 // 위와 같은 방식이 요즘 추세임.
