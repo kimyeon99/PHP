@@ -21,4 +21,11 @@ class Post extends Model
         $this->belongsToMany(User::class, 'post_user', 'post_id', 
             'user_id', 'id', 'id', 'users' );
     }
+    /*user
+    public function viewed_posts(){
+        // return $this->belongsToMany(Post::class);
+        return $this->belongsToMany(Post::class, 'post_user', 
+                    'user_id', 'post_id', 'id', 'id', 'posts');
+    }
+    */
 }
