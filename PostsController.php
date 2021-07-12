@@ -23,6 +23,12 @@ class PostsController extends Controller
     {
         $page = $request->page;
         $post = Post::find($id);
+        
+        if(Auth::user() == null && !$post->viewers->contains(false)){
+            $post->viewers()->attach(Auth::user()->id);  
+        }
+        // create_post_table : $table->timestamp('created_at')->deafult(new Expression('now()'));
+        
         return view('posts.show', compact('post', 'page'));
     }
 
