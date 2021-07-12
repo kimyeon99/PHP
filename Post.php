@@ -16,4 +16,9 @@ class Post extends Model
         $imageFile = $this->image ?? 'no_image.png';
         return $path . $imageFile;
     }
+    
+    public function viewers(){
+        $this->belongsToMany(User::class, 'post_user', 'post_id', 
+            'user_id', 'id', 'id', 'users' );
+    }
 }
