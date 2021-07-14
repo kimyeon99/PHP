@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChartController;
 use App\Http\Controllers\PostsController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,7 @@ Route::get('/posts/{post}', [PostsController::class, 'edit'])->name('posts.edit'
 Route::put('/posts/{id}', [PostsController::class, 'update'])->name('posts.update');
 Route::delete('/posts/{id}', [PostsController::class, 'destroy'])->name('posts.delete');
 
+Route::get('/chart/index', [ChartController::class, 'index']);
 
 // post -> 등록:post, 수정:patch || put, 제거:delete
 // 위와 같은 방식이 요즘 추세임.

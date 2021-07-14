@@ -72,23 +72,8 @@
               @endcan
               @endauth
               </div>
-
-
-
-
-          </div>
-
-           
-
-
-          
-      </div>
-        
-
-
-            
-
     </div>
 
 </body>
+
 </html>                                                                                             

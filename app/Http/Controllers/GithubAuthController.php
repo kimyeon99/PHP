@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Laravel\Socialite\Facades\Socialite;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class GithubAuthController extends Controller
 {
@@ -31,6 +31,7 @@ class GithubAuthController extends Controller
         // DB에 사용자 정보를 저장한다. 
         // 이미 이 사용자가 저장되어 있다면
         // 저장할 필요가 없다. 
+
 
         $user = User::firstOrCreate(
             [ // email이 없으면 email을 포함해서 아랫것들을 추가. 있으면 전부 추가안함

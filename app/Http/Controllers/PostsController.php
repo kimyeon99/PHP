@@ -60,7 +60,6 @@ class PostsController extends Controller
             그것을 @csrf 라고 함.(create.blade.php의 html에 사용)
         */
 
-        // DB에 저장
         $post = new Post();
         $post->title = $title;
         $post->content = $content;
@@ -75,7 +74,7 @@ class PostsController extends Controller
         if ($request->file('imageFile')) { // 파일이 필수가 아니라 없을 수도 있으므로 if
             $post->image = $this->uploadPostImage($request);
         }
-
+        // DB에 저장
         $post->save();
 
         return redirect('/posts/index');
